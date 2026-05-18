@@ -160,7 +160,8 @@ document.getElementById("btn-quit-game").addEventListener("click", () => {
 
 function showQuestion() {
     document.getElementById("game-progress").innerText = `問題: ${currentQIndex + 1} / 10`;
-    document.getElementById("question-display").innerText = currentQuestions[currentQIndex].q;
+    // Use innerHTML so things like x² render properly
+    document.getElementById("question-display").innerHTML = currentQuestions[currentQIndex].q;
     currentInput = "";
     updateAnswerDisplay();
 }
@@ -193,6 +194,18 @@ document.querySelector(".key.slash").addEventListener("click", () => {
         updateAnswerDisplay();
     }
 });
+document.querySelector(".key.comma").addEventListener("click", () => {
+    if (!currentInput.includes(",")) {
+        currentInput += ",";
+        updateAnswerDisplay();
+    }
+});
+document.querySelector(".key.root").addEventListener("click", () => {
+    if (!currentInput.includes("√")) {
+        currentInput += "√";
+        updateAnswerDisplay();
+    }
+});
 document.querySelector(".key.clear").addEventListener("click", () => {
     currentInput = "";
     updateAnswerDisplay();
@@ -204,10 +217,29 @@ document.querySelector(".key.enter").addEventListener("click", () => {
 
 function checkAnswer() {
     const q = currentQuestions[currentQIndex];
-    if (currentInput.trim() === q.a.trim()) {
-        score++;
+    let isCorrect = false;
+    if (Array.isArray(q.a)) {
+        isCorrect = q.a.includes(currentInput.trim());
+    } else {
+        isCorrect = currentInput.trim() === q.a.trim();
     }
     
+    if (isCorrect) {
+        score++;
+        nextQuestion();
+    } else {
+        document.getElementById("correct-answer-display").innerText = "正解: " + (Array.isArray(q.a) ? q.a[0] : q.a);
+        document.getElementById("hint-text").innerText = q.hint || "計算ミスに気をつけましょう。";
+        document.getElementById("hint-overlay").classList.remove("hidden");
+    }
+}
+
+document.getElementById("btn-next-question").addEventListener("click", () => {
+    document.getElementById("hint-overlay").classList.add("hidden");
+    nextQuestion();
+});
+
+function nextQuestion() {
     currentQIndex++;
     if (currentQIndex < 10) {
         showQuestion();

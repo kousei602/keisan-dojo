@@ -54,11 +54,20 @@
                 <div id="answer-display" class="answer-box"></div>
                 
                 <div class="keypad">
-                    <button class="key num">7</button><button class="key num">8</button><button class="key num">9</button>
-                    <button class="key num">4</button><button class="key num">5</button><button class="key num">6</button>
-                    <button class="key num">1</button><button class="key num">2</button><button class="key num">3</button>
-                    <button class="key action clear">C</button><button class="key num">0</button><button class="key num dot">.</button>
-                    <button class="key num minus">-</button><button class="key num slash">/</button><button class="key action enter">決定</button>
+                    <button class="key num">7</button><button class="key num">8</button><button class="key num">9</button><button class="key action clear">C</button>
+                    <button class="key num">4</button><button class="key num">5</button><button class="key num">6</button><button class="key num slash">/</button>
+                    <button class="key num">1</button><button class="key num">2</button><button class="key num">3</button><button class="key num minus">-</button>
+                    <button class="key num dot">.</button><button class="key num">0</button><button class="key num comma">,</button><button class="key num root">√</button>
+                    <button class="key action enter">決定</button>
+                </div>
+
+                <div id="hint-overlay" class="hint-overlay hidden">
+                    <div class="hint-box">
+                        <h3 class="hint-title">❌ 不正解</h3>
+                        <p id="correct-answer-display" class="correct-ans">正解: </p>
+                        <p id="hint-text" class="hint-text"></p>
+                        <button id="btn-next-question" class="btn primary mt-4">次へ進む</button>
+                    </div>
                 </div>
             </main>
         </div>
