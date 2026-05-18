@@ -339,8 +339,8 @@ main {
 .keypad {
     grid-template-areas: 
         "num7 num8 num9 clear"
-        "num4 num5 num6 minus"
-        "num1 num2 num3 enter"
+        "num4 num5 num6 slash"
+        "num1 num2 num3 minus"
         "num0 num0 dot enter";
 }
 .key:nth-child(1) { grid-area: num7; }
@@ -356,6 +356,7 @@ main {
 .key:nth-child(11) { grid-area: num0; }
 .key.dot { grid-area: dot; }
 .key.minus { grid-area: minus; }
+.key.slash { grid-area: slash; }
 .key.enter { grid-area: enter; }
 
 

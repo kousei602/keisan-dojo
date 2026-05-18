@@ -187,6 +187,12 @@ document.querySelector(".key.minus").addEventListener("click", () => {
     }
     updateAnswerDisplay();
 });
+document.querySelector(".key.slash").addEventListener("click", () => {
+    if (!currentInput.includes("/")) {
+        currentInput += "/";
+        updateAnswerDisplay();
+    }
+});
 document.querySelector(".key.clear").addEventListener("click", () => {
     currentInput = "";
     updateAnswerDisplay();
