@@ -215,6 +215,12 @@ function updateAnswerDisplay() {
 // Keypad
 document.querySelectorAll(".key.num").forEach(btn => {
     btn.addEventListener("click", (e) => {
+        if (e.target.classList.contains("minus") || 
+            e.target.classList.contains("slash") || 
+            e.target.classList.contains("comma") || 
+            e.target.classList.contains("root")) {
+            return; // These have their own custom event listeners below
+        }
         const val = e.target.innerText;
         if (currentInput.length < 10) {
             currentInput += val;
