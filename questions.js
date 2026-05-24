@@ -142,6 +142,27 @@ const CoreGenerators = {
             hint: isMul ? `分子どうし、分母どうしをかけ算して約分します。` : `割り算は、逆数にしてかけ算に直します。` 
         };
     },
+    "四則混合計算": (level) => {
+        if (level < 4) {
+            let a = getRandomInt(2, 20);
+            let b = getRandomInt(2, 10);
+            let c = getRandomInt(2, 10);
+            return { q: `${a} + ${b} × ${c} = ?`, a: (a + b * c).toString(), hint: `かけ算・わり算を先に計算します。\n${b} × ${c} = ${b * c}\n${a} + ${b * c} = ${a + b * c}` };
+        } else {
+            let a = getRandomInt(2, 9);
+            let b = getRandomInt(10, 30);
+            let c = getRandomInt(-10, -1);
+            let e = getRandomInt(2, 9);
+            let ansDiv = getRandomInt(2, 15);
+            let d = e * ansDiv;
+            
+            let qStr = `${a} × (${b} ${c}) - ${d} ÷ ${e} = ?`;
+            let ans = a * (b + c) - (d / e);
+            let hintStr = `カッコの中と、かけ算・わり算を先に計算します。\nカッコ: ${b} ${c} = ${b+c}\nかけ算: ${a} × ${b+c} = ${a*(b+c)}\nわり算: ${d} ÷ ${e} = ${d/e}\n最後に引き算: ${a*(b+c)} - ${d/e} = ${ans}`;
+            
+            return { q: qStr, a: ans.toString(), hint: hintStr };
+        }
+    },
     "単位変換": (level) => {
         const types = [
             { u1: 'km', u2: 'm', mult: 1000 },
@@ -227,19 +248,36 @@ const CoreGenerators = {
     },
     "一次方程式": (level) => {
         let x = getRandomInt(-10, 10) || 2;
-        let a = getRandomInt(2, 5);
-        let c_coeff = getRandomInt(-2, 2);
-        if (a === c_coeff) c_coeff--; 
-        let b = getRandomInt(-15, 15);
-        let d = (a * x + b) - (c_coeff * x);
-        
-        let bStr = b >= 0 ? `+ ${b}` : `- ${Math.abs(b)}`;
-        let dStr = d >= 0 ? `+ ${d}` : `- ${Math.abs(d)}`;
-        let cStr = c_coeff === 1 ? 'x ' : (c_coeff === -1 ? '-x ' : (c_coeff !== 0 ? `${c_coeff}x ` : ''));
-        if (c_coeff === 0) { dStr = d.toString(); } else if (d > 0) { dStr = `+ ${d}`; }
+        if (level < 4) {
+            let a = getRandomInt(2, 5);
+            let c_coeff = getRandomInt(-2, 2);
+            if (a === c_coeff) c_coeff--; 
+            let b = getRandomInt(-15, 15);
+            let d = (a * x + b) - (c_coeff * x);
+            
+            let bStr = b >= 0 ? `+ ${b}` : `- ${Math.abs(b)}`;
+            let dStr = d >= 0 ? `+ ${d}` : `- ${Math.abs(d)}`;
+            let cStr = c_coeff === 1 ? 'x ' : (c_coeff === -1 ? '-x ' : (c_coeff !== 0 ? `${c_coeff}x ` : ''));
+            if (c_coeff === 0) { dStr = d.toString(); } else if (d > 0) { dStr = `+ ${d}`; }
 
-        let hintStr = `xの項を左辺に、数字を右辺に移行します。\n${a - c_coeff}x = ${d - b}\nx = ${x}`;
-        return { q: `${a}x ${bStr} = ${cStr}${dStr}`, a: x.toString(), hint: hintStr };
+            let hintStr = `xの項を左辺に、数字を右辺に移行します。\n${a - c_coeff}x = ${d - b}\nx = ${x}`;
+            return { q: `${a}x ${bStr} = ${cStr}${dStr}`, a: x.toString(), hint: hintStr };
+        } else {
+            let A = getRandomInt(2, 5);
+            let C = getRandomInt(2, 5);
+            if (A === C) C--;
+            let B = getRandomInt(-9, 9);
+            let D = getRandomInt(-9, 9);
+            
+            let E = (A - C) * x + (A * B) + (C * D);
+            
+            let bStr = B > 0 ? `+ ${B}` : `- ${Math.abs(B)}`;
+            let dStr = D > 0 ? `- ${D}` : `+ ${Math.abs(D)}`;
+            let eStr = E > 0 ? `+ ${E}` : (E < 0 ? `- ${Math.abs(E)}` : "");
+            
+            let hintStr = `カッコを展開します。\n${A}x ${A*B > 0 ? '+ '+A*B : '- '+Math.abs(A*B)} = ${C}x ${C*(-D) > 0 ? '+ '+C*(-D) : '- '+Math.abs(C*D)} ${eStr}\n移項して整理します。\n${A - C}x = ${(C*(-D) + E) - (A*B)}\nx = ${x}`;
+            return { q: `${A}(x ${bStr}) = ${C}(x ${dStr}) ${eStr}`, a: x.toString(), hint: hintStr };
+        }
     },
     "平方根": (level) => {
         const type = getRandomInt(1, 2);
@@ -265,18 +303,23 @@ const CoreGenerators = {
         let sum = ans1 + ans2;
         let prod = ans1 * ans2;
         
-        let bStr = sum === 0 ? "" : (sum > 0 ? `- ${sum}x` : `+ ${Math.abs(sum)}x`);
-        if (sum === 1) bStr = "- x";
-        if (sum === -1) bStr = "+ x";
-        
-        let cStr = prod === 0 ? "" : (prod > 0 ? `+ ${prod}` : `- ${Math.abs(prod)}`);
-        
-        let qStr = `x² ${bStr} ${cStr} = 0`;
         let ansStr1 = `${ans1},${ans2}`;
         let ansStr2 = `${ans2},${ans1}`;
         
-        let hintStr = `かけて ${prod} 、足して ${sum === 0 ? 0 : -sum} になる2つの数を探します。\n(x - ${ans1})(x - ${ans2}) = 0\nよって x = ${ans1}, ${ans2}`;
-        return { q: qStr, a: [ansStr1, ansStr2], hint: hintStr };
+        if (level < 4) {
+            let bStr = sum === 0 ? "" : (sum > 0 ? `- ${sum}x` : `+ ${Math.abs(sum)}x`);
+            if (sum === 1) bStr = "- x";
+            if (sum === -1) bStr = "+ x";
+            let cStr = prod === 0 ? "" : (prod > 0 ? `+ ${prod}` : `- ${Math.abs(prod)}`);
+            let hintStr = `かけて ${prod} 、足して ${sum === 0 ? 0 : -sum} になる2つの数を探します。\n(x - ${ans1})(x - ${ans2}) = 0\nよって x = ${ans1}, ${ans2}`;
+            return { q: `x² ${bStr} ${cStr} = 0`, a: [ansStr1, ansStr2], hint: hintStr };
+        } else {
+            let sumStr = sum === 0 ? "" : (sum > 0 ? `- ${sum}` : `+ ${Math.abs(sum)}`);
+            let rhs = -prod;
+            let qStr = sum === 0 ? `x² = ${rhs}` : `x(x ${sumStr}) = ${rhs}`;
+            let hintStr = `展開して右辺を0にします。\nx² ${sum > 0 ? '- '+sum : '+ '+Math.abs(sum)}x ${rhs > 0 ? '- '+rhs : '+ '+Math.abs(rhs)} = 0\n(x - ${ans1})(x - ${ans2}) = 0\nx = ${ans1}, ${ans2}`;
+            return { q: qStr, a: [ansStr1, ansStr2], hint: hintStr };
+        }
     }
 };
 
@@ -287,7 +330,7 @@ const SubjectCategories = [
             "たし算", "ひき算", "九九", "かけ算", "わり算", "整数まとめ",
             "小数のたし算・ひき算", "小数のかけ算・わり算", "小数まとめ",
             "分数のたし算・ひき算", "分数のかけ算・わり算", "分数まとめ",
-            "単位変換", "円周率の計算", "全部ごちゃまぜ"
+            "単位変換", "円周率の計算", "四則混合計算", "全部ごちゃまぜ"
         ]
     },
     {

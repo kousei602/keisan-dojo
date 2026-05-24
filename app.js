@@ -94,6 +94,11 @@ function renderHome() {
             
             const scroll = document.createElement("div");
             scroll.className = "difficulty-scroll";
+
+            subTitle.addEventListener("click", () => {
+                subTitle.classList.toggle("expanded");
+                scroll.classList.toggle("expanded");
+            });
             
             Difficulties.forEach((diff, idx) => {
                 const prog = getProgress(sub, idx);
@@ -262,12 +267,14 @@ function endGame() {
     const wasUnlocked = prog.unlocked;
     const oldPercent = Math.min(prog.clearCount * 10, 100);
     
-    if (isClear && !wasUnlocked) {
-        prog.clearCount++;
-        if (prog.clearCount >= 10) {
-            prog.unlocked = true;
+    if (isClear) {
+        if (!wasUnlocked) {
+            prog.clearCount++;
+            if (prog.clearCount >= 10) {
+                prog.unlocked = true;
+            }
+            saveDataToLocal();
         }
-        saveDataToLocal();
     }
     
     const newPercent = Math.min(prog.clearCount * 10, 100);
@@ -284,7 +291,7 @@ function endGame() {
     }, 100);
     
     const titleAnnouncement = document.getElementById("new-title-announcement");
-    if (!wasUnlocked && prog.unlocked) {
+    if (isClear && !wasUnlocked && prog.unlocked) {
         // Just unlocked
         titleAnnouncement.classList.remove("hidden");
         document.getElementById("new-title-name").innerText = `${currentSubject} ${Difficulties[currentLevelIndex].name}`;
