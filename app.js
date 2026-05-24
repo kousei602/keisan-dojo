@@ -148,6 +148,34 @@ document.getElementById("btn-close-modal").addEventListener("click", () => {
 document.getElementById("btn-mode-mental").addEventListener("click", () => startGame());
 document.getElementById("btn-mode-written").addEventListener("click", () => startGame());
 
+// --- Daily Routine Logic ---
+document.getElementById("btn-daily-elem").addEventListener("click", () => startDaily("小学生向け"));
+document.getElementById("btn-daily-junior").addEventListener("click", () => startDaily("中学生向け"));
+
+function startDaily(categoryName) {
+    currentSubject = "今日の十問";
+    currentLevelIndex = -1; // special indicator
+    currentQuestions = generateDailyQuestions(categoryName, 10);
+    currentQIndex = 0;
+    score = 0;
+    switchView("game");
+    showQuestion();
+}
+
+function generateDailyQuestions(categoryName, count) {
+    const questions = [];
+    const category = SubjectCategories.find(c => c.category === categoryName);
+    const validSubjects = category.subjects.filter(s => s !== "全部ごちゃまぜ" && s !== "整数まとめ" && s !== "小数まとめ" && s !== "分数まとめ");
+    
+    for (let i = 0; i < count; i++) {
+        const sub = validSubjects[Math.floor(Math.random() * validSubjects.length)];
+        const generator = Generators[sub];
+        const lvl = Math.floor(Math.random() * 8); // 0 to 7 (7級 to 初段)
+        questions.push(generator(lvl));
+    }
+    return questions;
+}
+
 // --- Game Logic ---
 function startGame() {
     modalModeSelect.classList.add("hidden");
@@ -195,10 +223,10 @@ document.querySelectorAll(".key.num").forEach(btn => {
     });
 });
 document.querySelector(".key.minus").addEventListener("click", () => {
-    if (!currentInput.includes("-")) {
-        currentInput = "-" + currentInput;
+    if (currentInput.startsWith("-")) {
+        currentInput = currentInput.substring(1);
     } else {
-        currentInput = currentInput.replace("-", "");
+        currentInput = "-" + currentInput;
     }
     updateAnswerDisplay();
 });
@@ -272,41 +300,48 @@ function endGame() {
     document.getElementById("result-message").innerText = isClear ? "クリア！✨" : "残念！次は頑張ろう";
     document.getElementById("result-message").style.color = isClear ? "var(--accent-gold)" : "var(--accent-red)";
     
-    const prog = getProgress(currentSubject, currentLevelIndex);
-    const wasUnlocked = prog.unlocked;
-    const oldPercent = Math.min(prog.clearCount * 10, 100);
-    
-    if (isClear) {
-        if (!wasUnlocked) {
-            prog.clearCount++;
-            if (prog.clearCount >= 10) {
-                prog.unlocked = true;
+    if (currentLevelIndex !== -1) {
+        const prog = getProgress(currentSubject, currentLevelIndex);
+        const wasUnlocked = prog.unlocked;
+        const oldPercent = Math.min(prog.clearCount * 10, 100);
+        
+        if (isClear) {
+            if (!wasUnlocked) {
+                prog.clearCount++;
+                if (prog.clearCount >= 10) {
+                    prog.unlocked = true;
+                }
+                saveDataToLocal();
             }
-            saveDataToLocal();
         }
-    }
-    
-    const newPercent = Math.min(prog.clearCount * 10, 100);
-    
-    document.getElementById("result-progress-text").innerText = `達成度: ${oldPercent}% ${isClear && !wasUnlocked ? '→ ' + newPercent + '%' : ''}`;
-    
-    const fill = document.getElementById("result-progress-fill");
-    fill.style.transition = "none";
-    fill.style.width = `${oldPercent}%`;
-    
-    setTimeout(() => {
-        fill.style.transition = "width 1s cubic-bezier(0.1, 0.7, 0.1, 1)";
-        fill.style.width = `${newPercent}%`;
-    }, 100);
-    
-    const titleAnnouncement = document.getElementById("new-title-announcement");
-    if (isClear && !wasUnlocked && prog.unlocked) {
-        // Just unlocked
-        titleAnnouncement.classList.remove("hidden");
-        document.getElementById("new-title-name").innerText = `${currentSubject} ${Difficulties[currentLevelIndex].name}`;
-        fireConfetti();
+        
+        const newPercent = Math.min(prog.clearCount * 10, 100);
+        
+        document.getElementById("result-progress-text").innerText = `達成度: ${oldPercent}% ${isClear && !wasUnlocked ? '→ ' + newPercent + '%' : ''}`;
+        
+        const fill = document.getElementById("result-progress-fill");
+        fill.style.transition = "none";
+        fill.style.width = `${oldPercent}%`;
+        
+        setTimeout(() => {
+            fill.style.transition = "width 1s cubic-bezier(0.1, 0.7, 0.1, 1)";
+            fill.style.width = `${newPercent}%`;
+        }, 100);
+        
+        const titleAnnouncement = document.getElementById("new-title-announcement");
+        if (isClear && !wasUnlocked && prog.unlocked) {
+            titleAnnouncement.classList.remove("hidden");
+            document.getElementById("new-title-name").innerText = `${currentSubject} ${Difficulties[currentLevelIndex].name}`;
+            fireConfetti();
+        } else {
+            titleAnnouncement.classList.add("hidden");
+        }
     } else {
-        titleAnnouncement.classList.add("hidden");
+        // Daily Routine result
+        document.getElementById("result-progress-text").innerText = isClear ? "すばらしい！明日の十問も頑張ろう！" : "また明日チャレンジしよう！";
+        document.getElementById("result-progress-fill").style.width = "100%";
+        document.getElementById("new-title-announcement").classList.add("hidden");
+        if (isClear) fireConfetti();
     }
 }
 

@@ -229,14 +229,26 @@ const CoreGenerators = {
         }
     },
     "円周率の計算": (level) => {
-        const r = getRandomInt(2, level < 4 ? 10 : 20);
-        const isArea = Math.random() > 0.5;
-        if (isArea) {
-            let ans = (r * r * 3.14).toFixed(2);
-            return { q: `半径${r}の円の面積は？`, a: Number(ans).toString(), hint: `円の面積 = 半径 × 半径 × 3.14` };
+        const type = Math.random();
+        if (type < 0.4) {
+            // N x 3.14 variation
+            const multipliers = [2, 3, 4, 5, 6, 7, 8, 9, 12, 15, 25];
+            const r = multipliers[getRandomInt(0, multipliers.length - 1)];
+            let ans = r * 3.14;
+            ans = Math.round(ans * 100) / 100;
+            return { q: `${r} × 3.14 = ?`, a: ans.toString(), hint: `筆算で小数点以下2桁まで計算します。` };
         } else {
-            let ans = (r * 2 * 3.14).toFixed(2);
-            return { q: `半径${r}の円周は？`, a: Number(ans).toString(), hint: `円周 = 直径(半径×2) × 3.14` };
+            const r = getRandomInt(2, level < 4 ? 10 : 20);
+            const isArea = type > 0.7;
+            if (isArea) {
+                let ans = r * r * 3.14;
+                ans = Math.round(ans * 100) / 100;
+                return { q: `半径${r}cmの円の面積は？`, a: ans.toString(), hint: `面積 = 半径 × 半径 × 3.14\n${r} × ${r} × 3.14 を計算します。` };
+            } else {
+                let ans = r * 2 * 3.14;
+                ans = Math.round(ans * 100) / 100;
+                return { q: `半径${r}cmの円の円周は？`, a: ans.toString(), hint: `円周 = 直径 × 3.14\n${r * 2} × 3.14 を計算します。` };
+            }
         }
     },
     
