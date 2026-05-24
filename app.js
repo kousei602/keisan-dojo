@@ -169,8 +169,8 @@ function showQuestion() {
     qDisp.innerHTML = currentQuestions[currentQIndex].q;
     
     // Auto-scale font size to fit container
-    qDisp.style.fontSize = "3rem";
-    let fontSize = 3.0;
+    qDisp.style.fontSize = "4.5rem";
+    let fontSize = 4.5;
     while (qDisp.scrollHeight > qDisp.clientHeight && fontSize > 1.0) {
         fontSize -= 0.1;
         qDisp.style.fontSize = `${fontSize}rem`;
