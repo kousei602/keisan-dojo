@@ -20,19 +20,44 @@ function gcd(x, y) { return y === 0 ? x : gcd(y, x % y); }
 const CoreGenerators = {
     // === 小学生向け ===
     "たし算": (level) => {
-        const maxDigit = level < 3 ? 10 : (level < 6 ? 100 : 1000);
-        const a = getRandomInt(1, maxDigit);
-        const b = getRandomInt(1, maxDigit);
-        const ans = a + b;
-        return { q: `${a} + ${b} = ?`, a: ans.toString(), hint: `${a}と${b}を足します。一の位から順に計算しましょう。` };
+        if (level < 4) {
+            const maxDigit = level < 3 ? 10 : 100;
+            const a = getRandomInt(1, maxDigit);
+            const b = getRandomInt(1, maxDigit);
+            const ans = a + b;
+            return { q: `${a} + ${b} = ?`, a: ans.toString(), hint: `${a}と${b}を足します。一の位から順に計算しましょう。` };
+        } else {
+            const termsCount = getRandomInt(3, 4);
+            let terms = [];
+            let ans = 0;
+            for(let i=0; i<termsCount; i++) {
+                let v = getRandomInt(10, 100);
+                terms.push(v);
+                ans += v;
+            }
+            return { q: `${terms.join(' + ')} = ?`, a: ans.toString(), hint: `複数のたし算です。順番に足すか、足しやすいペアを見つけて計算しましょう。` };
+        }
     },
     "ひき算": (level) => {
-        const maxDigit = level < 3 ? 10 : (level < 6 ? 100 : 1000);
-        let a = getRandomInt(1, maxDigit);
-        let b = getRandomInt(1, maxDigit);
-        let big = Math.max(a, b);
-        let small = Math.min(a, b);
-        return { q: `${big} - ${small} = ?`, a: (big - small).toString(), hint: `${big}から${small}を引きます。桁を揃えて計算しましょう。` };
+        if (level < 4) {
+            const maxDigit = level < 3 ? 10 : 100;
+            let a = getRandomInt(1, maxDigit);
+            let b = getRandomInt(1, maxDigit);
+            let big = Math.max(a, b);
+            let small = Math.min(a, b);
+            return { q: `${big} - ${small} = ?`, a: (big - small).toString(), hint: `${big}から${small}を引きます。桁を揃えて計算しましょう。` };
+        } else {
+            const termsCount = getRandomInt(3, 4);
+            let total = getRandomInt(100, 500);
+            let ans = total;
+            let terms = [total];
+            for(let i=1; i<termsCount; i++) {
+                let v = getRandomInt(10, 50);
+                terms.push(v);
+                ans -= v;
+            }
+            return { q: `${terms.join(' - ')} = ?`, a: ans.toString(), hint: `順番に引くか、引く数をすべて足してから一気に引きましょう。` };
+        }
     },
     "九九": (level) => {
         let maxMultiplier = 9;
@@ -44,19 +69,41 @@ const CoreGenerators = {
         return { q: `${a} × ${b} = ?`, a: (a * b).toString(), hint: `${a}を${b}回足した数です。` };
     },
     "かけ算": (level) => {
-        const maxA = level < 4 ? 20 : 100;
-        const maxB = level < 4 ? 9 : 50;
-        const a = getRandomInt(2, maxA);
-        const b = getRandomInt(2, maxB);
-        return { q: `${a} × ${b} = ?`, a: (a * b).toString(), hint: `筆算を使って計算しましょう。` };
+        if (level < 4) {
+            const maxA = level < 3 ? 20 : 100;
+            const maxB = level < 3 ? 9 : 50;
+            const a = getRandomInt(2, maxA);
+            const b = getRandomInt(2, maxB);
+            return { q: `${a} × ${b} = ?`, a: (a * b).toString(), hint: `筆算を使って計算しましょう。` };
+        } else {
+            let termsCount = getRandomInt(3, 4);
+            let terms = [];
+            let ans = 1;
+            for(let i=0; i<termsCount; i++) {
+                let v = getRandomInt(2, 10);
+                if (i === 0 && Math.random() > 0.5) v = getRandomInt(10, 20); // Make the first one slightly bigger
+                terms.push(v);
+                ans *= v;
+            }
+            return { q: `${terms.join(' × ')} = ?`, a: ans.toString(), hint: `順番にかけるか、かけやすいペア（例: 2×5=10）を先に見つけて計算しましょう。` };
+        }
     },
     "わり算": (level) => {
-        const maxA = level < 4 ? 9 : 30;
-        const maxB = level < 4 ? 9 : 20;
-        const a = getRandomInt(2, maxA);
-        const b = getRandomInt(2, maxB);
-        const c = a * b;
-        return { q: `${c} ÷ ${a} = ?`, a: b.toString(), hint: `${a}に何をかけると${c}になるか考えます。` };
+        if (level < 4) {
+            const maxA = level < 3 ? 9 : 30;
+            const maxB = level < 3 ? 9 : 20;
+            const a = getRandomInt(2, maxA);
+            const b = getRandomInt(2, maxB);
+            const c = a * b;
+            return { q: `${c} ÷ ${a} = ?`, a: b.toString(), hint: `${a}に何をかけると${c}になるか考えます。` };
+        } else {
+            // A ÷ B ÷ C
+            let c = getRandomInt(2, 10);
+            let b = getRandomInt(2, 10);
+            let a = getRandomInt(2, 10); // final answer
+            let startVal = a * b * c;
+            return { q: `${startVal} ÷ ${b} ÷ ${c} = ?`, a: a.toString(), hint: `左から順番に割り算するか、わる数を先にかけて（${b}×${c}=${b*c}）一気に割りましょう。` };
+        }
     },
     "小数のたし算・ひき算": (level) => {
         let a = getRandomInt(1, 99) / 10;
@@ -195,24 +242,44 @@ const CoreGenerators = {
     
     // === 中学生向け ===
     "正負の数": (level) => {
-        let a = getRandomInt(-20, 20);
-        let b = getRandomInt(-20, 20);
-        if (a === 0) a = 2; if (b === 0) b = 3;
-        const ops = ['+', '-', '×'];
-        const op = ops[getRandomInt(0, 2)];
-        
-        let qStr = `${a} ${op} ${b < 0 ? `(${b})` : b}`;
-        let ans;
-        if (op === '+') ans = a + b;
-        if (op === '-') ans = a - b;
-        if (op === '×') ans = a * b;
-        
-        let hintStr = "";
-        if (op === '+') hintStr = `同符号は足して共通の符号、異符号は差をとって大きい方の符号。`;
-        if (op === '-') hintStr = `引き算は、足し算に直して符号を逆にします。`;
-        if (op === '×') hintStr = `マイナス×マイナスはプラスになります。`;
-        
-        return { q: `${qStr} = ?`, a: ans.toString(), hint: hintStr };
+        if (level < 4) {
+            let a = getRandomInt(-20, 20);
+            let b = getRandomInt(-20, 20);
+            if (a === 0) a = 2; if (b === 0) b = 3;
+            const ops = ['+', '-', '×'];
+            const op = ops[getRandomInt(0, 2)];
+            
+            let qStr = `${a} ${op} ${b < 0 ? `(${b})` : b}`;
+            let ans;
+            if (op === '+') ans = a + b;
+            if (op === '-') ans = a - b;
+            if (op === '×') ans = a * b;
+            
+            let hintStr = "";
+            if (op === '+') hintStr = `同符号は足して共通の符号、異符号は差をとって大きい方の符号。`;
+            if (op === '-') hintStr = `引き算は、足し算に直して符号を逆にします。`;
+            if (op === '×') hintStr = `マイナス×マイナスはプラスになります。`;
+            
+            return { q: `${qStr} = ?`, a: ans.toString(), hint: hintStr };
+        } else {
+            let termsCount = getRandomInt(3, 4);
+            let qStr = "";
+            let ans = 0;
+            for(let i=0; i<termsCount; i++) {
+                let v = getRandomInt(-15, 15);
+                if (v === 0) v = 2;
+                let isAdd = Math.random() > 0.5;
+                if (i === 0) {
+                    qStr += `${v}`;
+                    ans = v;
+                } else {
+                    let op = isAdd ? '+' : '-';
+                    qStr += ` ${op} ${v < 0 ? `(${v})` : v}`;
+                    ans = isAdd ? ans + v : ans - v;
+                }
+            }
+            return { q: `${qStr} = ?`, a: ans.toString(), hint: `項を整理し、正の数と負の数それぞれでまとめてから計算しましょう。` };
+        }
     },
     "比例・反比例": (level) => {
         const isProportional = Math.random() > 0.5;

@@ -165,8 +165,17 @@ document.getElementById("btn-quit-game").addEventListener("click", () => {
 
 function showQuestion() {
     document.getElementById("game-progress").innerText = `問題: ${currentQIndex + 1} / 10`;
-    // Use innerHTML so things like x² render properly
-    document.getElementById("question-display").innerHTML = currentQuestions[currentQIndex].q;
+    const qDisp = document.getElementById("question-display");
+    qDisp.innerHTML = currentQuestions[currentQIndex].q;
+    
+    // Auto-scale font size to fit container
+    qDisp.style.fontSize = "3rem";
+    let fontSize = 3.0;
+    while (qDisp.scrollHeight > qDisp.clientHeight && fontSize > 1.0) {
+        fontSize -= 0.1;
+        qDisp.style.fontSize = `${fontSize}rem`;
+    }
+    
     currentInput = "";
     updateAnswerDisplay();
 }
